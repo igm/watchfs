@@ -18,13 +18,11 @@ var (
 	timeout = flag.String("t", "500ms", "period to wait after the file change (to wait till the changes settle) if format like 1s, 200ms, ...")
 	expr    = flag.String("f", "^[^\\.].*", "regular expression for file names to monitor for changes, default ignores hidden files. To filter \"*.go\" files use -f=\".*\\.go$\" to filter *.go files")
 
-	fileExp  *regexp.Regexp
-	cmd      []string
-	waittime time.Duration
+	fileExp *regexp.Regexp
+	cmd     []string
 )
 
 func init() {
-	//
 	flag.Parse()
 	cmd = flag.Args()
 	fileExp = regexp.MustCompile(*expr)
@@ -35,33 +33,27 @@ func main() {
 		flag.Usage()
 		return
 	}
-	var err error
-	if waittime, err = time.ParseDuration(*timeout); err != nil {
+	waittime, err := time.ParseDuration(*timeout)
+	if err != nil {
 		fmt.Println(err.Error())
 		flag.Usage()
 		return
 	}
-
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		log.Fatal(err)
 	}
+	var timeoutCh <-chan time.Time = nil
 	go func() {
 		for {
 			select {
 			case event := <-watcher.Event:
-				if !fileExp.MatchString(event.Name) {
-					continue
+				if fileExp.MatchString(event.Name) {
+					timeoutCh = time.After(waittime)
 				}
-				for {
-					select {
-					case <-watcher.Event:
-						continue
-					case <-time.After(waittime):
-					}
-					runCommand()
-					break
-				}
+			case <-timeoutCh:
+				timeoutCh = nil
+				runCommand()
 			}
 		}
 	}()
