@@ -19,6 +19,10 @@ Simple notification after any change on the file system (ignoring hidden files s
 ```
   $ watchfs -f ".\*\.go$" go test 
 ```
+To specify a different time wait period after a change (or set of changes) occurs use timeout parameter:
+```
+  $ watchfs -t 250ms go test
+```
 For the full ist of avaialble parameters run command without any parameters:
 ```
   $ watchfs

@@ -14,11 +14,12 @@ import (
 )
 
 var (
-	timeout = flag.Int64("t", 500, "period to wait after the file change (to wait till the changes settle)")
+	timeout = flag.String("t", "500ms", "period to wait after the file change (to wait till the changes settle) if format like 1s, 200ms, ...")
 	expr    = flag.String("f", "^[^\\.].*", "regular expression for file names to monitor for changes, default ignores hidden files. To filter \"*.go\" files use -f=\".*\\.go$\" to filter *.go files")
 
-	fileExp *regexp.Regexp
-	cmd     []string
+	fileExp  *regexp.Regexp
+	cmd      []string
+	waittime time.Duration
 )
 
 func init() {
@@ -33,6 +34,13 @@ func main() {
 		flag.Usage()
 		return
 	}
+	var err error
+	if waittime, err = time.ParseDuration(*timeout); err != nil {
+		fmt.Println(err.Error())
+		flag.Usage()
+		return
+	}
+
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		log.Fatal(err)
@@ -48,7 +56,7 @@ func main() {
 					select {
 					case <-watcher.Event:
 						continue
-					case <-time.After(time.Duration(*timeout) * time.Millisecond):
+					case <-time.After(waittime):
 					}
 					runCommand()
 					break
