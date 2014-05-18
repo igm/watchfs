@@ -23,14 +23,14 @@ To specify a different time wait period after a change (or set of changes) occur
 ```
   $ watchfs -t 250ms go test
 ```
-For the full ist of avaialble parameters run command without any parameters:
+For the full ist of available parameters and the defaults run command without any parameters:
 ```
   $ watchfs
 ```
 
 ### Limitations
 
-Current version supports current directory monitoring only. Recursive file system monitoring is not supported.
+Current version supports shallow directory monitoring only. Recursive file system monitoring is not supported.
 
 ## Timeout
 

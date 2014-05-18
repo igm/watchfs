@@ -14,6 +14,7 @@ import (
 )
 
 var (
+	dir     = flag.String("d", ".", "direcotry to watch")
 	timeout = flag.String("t", "500ms", "period to wait after the file change (to wait till the changes settle) if format like 1s, 200ms, ...")
 	expr    = flag.String("f", "^[^\\.].*", "regular expression for file names to monitor for changes, default ignores hidden files. To filter \"*.go\" files use -f=\".*\\.go$\" to filter *.go files")
 
@@ -64,7 +65,7 @@ func main() {
 			}
 		}
 	}()
-	if err = watcher.Watch("."); err != nil {
+	if err = watcher.Watch(*dir); err != nil {
 		log.Fatal(err)
 	}
 	runCommand()
