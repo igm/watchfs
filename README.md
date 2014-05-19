@@ -10,14 +10,14 @@ The tool can be installed using "go get" command:
 
 ## Usage
 
-Simple notification after any change on the file system (ignoring hidden files starting with "."):
+Simple notification after any change on the file system:
 ```
   $ watchfs echo "change!!!"
 ```
  As the original purpose of this tool was to execute go tests automatically after the source code change
- the format for that purpose is:
+ the format to filter notification for \*.go files can following:
 ```
-  $ watchfs -f ".\*\.go$" go test 
+  $ watchfs -f "\.go$" go test 
 ```
 To specify a different time wait period after a change (or set of changes) occurs use timeout parameter:
 ```
