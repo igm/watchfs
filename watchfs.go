@@ -49,6 +49,8 @@ func main() {
 		var timeoutCh <-chan time.Time = nil
 		for {
 			select {
+			case err := <-watcher.Error:
+				log.Fatal(err)
 			case event := <-watcher.Event:
 				if fileExp.MatchString(event.Name) {
 					timeoutCh = time.After(waittime)
